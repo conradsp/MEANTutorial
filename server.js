@@ -1,19 +1,25 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+
+var config = require('./config');
 
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
 
 var port = process.env.PORT || 3000;
 
-var router = express.Router();
+mongoose.connect(config.dburl, {useMongoClient:true}, (err) => {
+    if (err) {
+        console.log('Error connecting to db');
+        console.log(`${err}`);
+    } else {
+        console.log('Connected to db');
+    }
+});
 
-router.get('/', (req, res) => {
-    res.json({ message: "You called the / endpoint"});
-})
-
-app.use('/api', router);
+require('./routes')(app);
 
 app.listen(port);
 console.log("MEAN Tutorial is running on port "+port);
